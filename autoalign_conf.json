@@ -1,0 +1,7 @@
+{
+    "data_folder": "/data/temp/www/autoalign",
+    "samtools":"/usr/local/bin/samtools",
+    "minimap2":"/usr/local/bin/minimap2",
+    "output_folder":"/data/temp/www/autoalign_output",
+    "output_url":"https://bioinfdev.babraham.ac.uk/autoalign/output/"
+}
