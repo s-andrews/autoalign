@@ -1,1 +1,6 @@
 /* Custom CSS goes here */
+
+label {
+    font-size: 150%;
+    padding-top: 1em;
+}

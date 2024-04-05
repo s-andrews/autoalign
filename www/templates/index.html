@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Automatic Nanopore Aligner{% endblock %}
 {% block content %}
-<div class="container-fluid text-center">
-  <img src="{{ url_for('static', filename='images/bioinformatics_logo.svg') }}" width="25%">
-</div>
-<div class="container-fluid text-center">
+<div class="container-fluid">
   <div class="row">
+    <div class="col-md-12"><h1>Automatic Nanopore Alignments</h1></div>
+  </div>
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-6">
+        <form action="start_alignment", method="POST", enctype="multipart/form-data">
+            <label for="reference">Reference File (Fasta format)</label>
+            <input class="form-control" name="reference" type="file" id="reference">
+            <label for="fastq">Sequencing File (fastq.gz format)</label>
+            <input class="form-control" type="file" name="fastq" id="fastq">
+            <input id="align" type="submit" class="form-control btn btn-primary mt-2" value="Start Alignment">
+        </form>
+        </div>
   </div>
 </div>
 {% endblock %}
