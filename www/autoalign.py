@@ -42,7 +42,7 @@ def start_alignment():
 
     subprocess.run(["../process_run.py",run_id], check=True)
 
-    return redirect(url_for("view_results/"+run_id))
+    return redirect(url_for("view_results",job_id=run_id))
 
 
 @app.route("/view_results/<job_id>")
