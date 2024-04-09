@@ -73,6 +73,13 @@ def main():
     for f in files_to_move:
         Path(f).rename(output_dir / f)
 
+    # Remove the content of the processing directory - we don't need it any more
+    os.chdir("..")
+    for i in Path(job_id).iterdir():
+        i.unlink()
+
+    Path(job_id).rmdir()
+
 
 def create_session_file(reference,bam,job_id, script_folder):
     # Read in the template
