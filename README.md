@@ -21,6 +21,9 @@ Using Auto Align
 
 You can use the publicly hosted version of auto align at https://www.bioinformatics.babraham.ac.uk/autoalign/
 
+<img src="../main/www/static/images/auto_align_input_form.png?raw=true" alt="Input Form Screenshot" width="100%">
+
+
 The results of the program are shown in IGV-Web.  You can see more details about the contols within this viewer in the [IGV Web Manual](https://igvteam.github.io/igv-webapp/)
 
 
