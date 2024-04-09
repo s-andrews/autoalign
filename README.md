@@ -24,6 +24,8 @@ You can use the publicly hosted version of auto align at https://www.bioinformat
 The results of the program are shown in IGV-Web.  You can see more details about the contols within this viewer in the [IGV Web Manual](https://igvteam.github.io/igv-webapp/)
 
 
+<img src="../main/www/static/images/example_alignment.png?raw=true" alt="Example Alignment" width="100%">
+
 
 Hosting your own copy of Auto Align
 ===================================
