@@ -66,6 +66,12 @@ def main():
     files_to_move.append(bam_index)
     aligned_files.append((sorted_bam,bam_index))
 
+    # Before we make the session file we're going to make a zip
+    # file of everything we've made so far
+    zip_file = create_zip(job_id,files_to_move)
+    files_to_move.append(zip_file)
+
+
     session_file = create_session_file(reference_file,sorted_bam, job_id, script_folder)
     files_to_move.append(session_file)
 
@@ -80,12 +86,19 @@ def main():
 
     Path(job_id).rmdir()
 
+def create_zip(job_id,files):
+
+    zip_file = "aligned_files_"+job_id+".zip"
+    zip_command= ["zip",zip_file]
+    zip_command.extend(files)
+
+    subprocess.run(zip_command, check=True)
+
+    return zip_file
 
 def create_session_file(reference,bam,job_id, script_folder):
     # Read in the template
     template = script_folder / "webapp_session_template.json"
-
-    print(template)
 
     session_data = None
     with open(template,"rt",encoding="utf8") as templatein:
