@@ -97,6 +97,20 @@ You need to install a configuration file so that apache knows how to access your
 
 Once you have edited the file to match your local setup you can install it by copying it to ```/etc/httpd/conf.d/```, and then restarting your web server with ```systemctl restart httpd```.
 
+
+Install the cron cleanup script
+-------------------------------
+
+To do the cleanup you need to put the ```cron_clean_up.py``` script into your cron schedule.  It doesn't really matter when it runs.  It will delete all input folders older than 1 day and all output folders older than 1 week.  You should run it from its location in the repository since it needs to find the configuration file.  You can use ```crontab -e``` as the user you're running the system as and then install the job as follows:
+
+```
+0       2       *       *       *       /srv/autoalign/cron_clean_up.py
+```
+
+That will run the clean up at 2am each day.
+
+
+
 Start your web app
 ------------------
 
