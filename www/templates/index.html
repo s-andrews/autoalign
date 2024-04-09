@@ -28,8 +28,10 @@
         <form action="start_alignment", method="POST", enctype="multipart/form-data">
             <label for="reference">Reference File (Fasta format)</label>
             <input class="form-control" name="reference" type="file" id="reference">
+            <div id="reference_error" class="invalid-feedback">Text</div>
             <label for="fastq">Sequencing File (fastq.gz format)</label>
             <input class="form-control" type="file" name="fastq" id="fastq">
+            <div id="fastq_error" class="invalid-feedback"></div>
             <input id="align" type="submit" class="form-control btn btn-primary mt-2" value="Start Alignment">
         </form>
         </div>
