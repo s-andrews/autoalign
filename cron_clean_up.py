@@ -15,7 +15,6 @@ conf_location = Path(__file__).parent / "autoalign_conf.json"
 with open(conf_location,"rt", encoding="utf8") as conffh:
     conf = json.load(conffh)
 
-
 # Our input deletion cutoff is just 1 day since nothing should
 # persist there
 cutoff = datetime.datetime.now() - datetime.timedelta(days=1)
