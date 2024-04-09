@@ -50,13 +50,29 @@ def main():
     # output directory
     files_to_move = []
 
-    reference_file = list(job_dir.glob("*.fa"))[0]
-    files_to_move.append(reference_file)
+    reference_file = None
+    for extension in ["*.fa","*.FA","*.fasta","*.FASTA"]:
+        file_list = list(job_dir.glob(extension))
+        if file_list:
+            reference_file=file_list[0]
+            files_to_move.append(reference_file)
+            break
+
+    if reference_file is None:
+        raise Exception("Couldn't find fasta reference file")
 
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
 
-    fastq_file = list(job_dir.glob("*fastq.gz"))[0]
+
+    fastq_file = None
+    for extension in ["*.fastq.gz","*.fastq","*.fq.gz","*.fq","*.FASTQ.GZ","*.FASTQ","*.FQ.GZ","*.FQ"]:
+        file_list = list(job_dir.glob(extension))
+        if file_list:
+            fastq_file = file_list[0]
+
+    if fastq_file is None:
+        raise Exception("Couldn't find fastq sequence file")
 
     aligned_files = []
 
@@ -144,7 +160,11 @@ def sort_file(bam):
 
 def align_file(file,reference):
 
-    bam_file = file.name.replace("fastq.gz","bam")
+    sections = file.name.split(".")
+    bam_file = None
+    for i,v in enumerate(sections):
+        if v.lower() == "fq" or v.lower() == "fastq":
+            bam_file = ".".join(sections[0:i])+".bam"
 
     minimap_proc = subprocess.Popen([config["minimap2"],"-ax","splice",reference.name,file.name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     subprocess.run([config["samtools"],"view","-bS","-q","10","-o",bam_file], stdin=minimap_proc.stdout)
