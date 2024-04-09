@@ -3,13 +3,13 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-12"><h1>Automatic Nanopore Alignments</h1></div>
+    <div class="col-md-12 text-center"><a href="{{ url_for('index')}}"><img src="{{ url_for('static', filename='images/autoalign_path.svg') }}" width="40%"></a></div>
   </div>
   <div class="row">
-    <div class="col-md-12 text-center"><h2>Results for Job {{ job_id }}</h2></div>
+    <div class="col-md-12 text-center darkbg"><h2>Results for Job {{ job_id }}</h2></div>
   </div>
   <div class="row">
-    <div class="col-md-12 text-center"><a href="https://igv.org/app/?sessionURL={{ baseurl }}/{{ job_id }}/igv_session.json" target="_igv" class="btn btn-info btn-lg" role="button">View Results in IGV</a></div>
+    <div id="igvbutton" class="col-md-12 text-center"><a href="https://igv.org/app/?sessionURL={{ baseurl }}/{{ job_id }}/igv_session.json" target="_igv" class="btn btn-info btn-lg" role="button">View Results in IGV</a></div>
   </div>
 
   <div class="row">
@@ -20,6 +20,9 @@
         <li><a class="filelink" href="{{ baseurl }}/{{ job_id }}/{{ file }}">{{ file }}</a></li>
         {% endfor %}
       </ul>
+      <p>
+        <a href="{{ baseurl }}/{{ job_id }}/{{ zip }}" class="btn btn-info" role="button">Download All Files</a>
+      </p>
     </div>
   </div>
 </div>

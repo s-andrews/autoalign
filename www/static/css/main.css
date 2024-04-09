@@ -6,15 +6,14 @@ label {
 }
 
 #footer {
-    background-color: grey;
     margin-top:2em;
-    color: white;
+    color: grey;
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 }
 
 #footer a {
-    color: white;
+    color: darkgray;
 }
 
 #align {
@@ -22,7 +21,7 @@ label {
 }
 
 .darkbg {
-    background-color: grey;
+    background-color: #aa8800ff;
     color: white;
 }
 
@@ -34,4 +33,13 @@ label {
 .filelink:hover{
     color: black;
     text-decoration: underline;
+}
+
+#igvbutton {
+    padding: 1em;
+}
+
+h1,h2,h3 {
+    font-family: 'Consolas','Courier New', Courier, monospace;
+    margin-top: 0.2em;
 }

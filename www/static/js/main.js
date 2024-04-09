@@ -4,6 +4,9 @@ $( document ).ready(function() {
     $("#fastq").change(check_files)
 
     $("#align").prop("disabled",true)
+    $("#align").css("background-color","lightgrey")
+    $("#align").css("border-color","lightgrey")
+
 });
 
 function check_files(){
@@ -60,9 +63,14 @@ function check_files(){
 
     if (allgood) {
         $("#align").prop("disabled",false)
+        $("#align").css("background-color","green")
+        $("#align").css("border-color","green")
+
     }
     else {
         $("#align").prop("disabled",true)
+        $("#align").css("background-color","lightgrey")
+        $("#align").css("border-color","lightgrey")
     }
 
 

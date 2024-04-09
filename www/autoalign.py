@@ -51,10 +51,15 @@ def view_results(job_id):
     fileit = (Path(server_conf["output_folder"]) / job_id).iterdir()
     files = []
 
-    for file in fileit:
-        files.append(file.name)
+    zip_file = None
 
-    return render_template("results.html", job_id=job_id, files=files, baseurl=server_conf["output_url"])
+    for file in fileit:
+        if file.name.endswith(".zip"):
+            zip_file = file.name
+        else:
+            files.append(file.name)
+
+    return render_template("results.html", job_id=job_id, files=files, zip=zip_file, baseurl=server_conf["output_url"])
 
 def get_form():
     if request.method == "GET":

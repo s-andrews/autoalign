@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-12"><h1>Automatic Nanopore Alignments</h1></div>
+    <div class="col-md-12 text-center"><a href="{{ url_for('index')}}"><img src="{{ url_for('static', filename='images/autoalign_path.svg') }}" width="40%"></a></div>
   </div>
   <div class="row">
     <div class="col-md-12 text-center darkbg">
@@ -32,7 +32,7 @@
             <label for="fastq">Sequencing File (fastq.gz format)</label>
             <input class="form-control" type="file" name="fastq" id="fastq">
             <div id="fastq_error" class="invalid-feedback"></div>
-            <input id="align" type="submit" class="form-control btn btn-primary mt-2" value="Start Alignment">
+            <input id="align" type="submit" class="form-control btn btn-danger mt-2" value="Start Alignment">
         </form>
         </div>
   </div>
