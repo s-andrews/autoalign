@@ -1,4 +1,4 @@
-<img src="../main/www/static/images/autoalign_path.svg?raw=true" alt="AutoAlign Logo" width="50%">
+<img src="../main/www/static/images/autoalign_path.svg?raw=true" alt="AutoAlign Logo" width="100%">
 
 Introduction
 ============
