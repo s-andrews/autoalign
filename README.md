@@ -1,5 +1,7 @@
-Automatic alignment of small nanopore runs
-==========================================
+![Auto Align Logo](../main/www/static/images/autoalign_path.svg?raw=true)
+
+Introduction
+============
 
 The validation of sequencing constructs used to be performed using Sanger sequencing.  More recently small scale Nanopore sequencing has been used instead, producing small fastq files from a single amplified PCR product, or plasmid.
 
@@ -12,5 +14,105 @@ The program here will undertake the following operations
 3. Sort and index the BAM files produced using samtools
 4. Place the resulting files in a web-accesible directory
 5. Create an IGV config file which will open a session to view the alignments
+
+
+Using Auto Align
+================
+
+You can use the publicly hosted version of auto align at https://www.bioinformatics.babraham.ac.uk/autoalign/
+
+The results of the program are shown in IGV-Web.  You can see more details about the contols within this viewer in the [IGV Web Manual](https://igvteam.github.io/igv-webapp/)
+
+
+
+Hosting your own copy of Auto Align
+===================================
+
+If you prefer you can install AutoAlign on your own server.  Alignments will be performed locally and hosted on your machine.  Because of the link to the IGV web app the results of the alignments must be hosted on a site which is generally available on the internet - you can't put this behind a firewall.  If you only want to be able to download the data or use it on a private copy of IGV behind your firewall then this will still work though.
+
+Install a base operating system
+-------------------------------
+
+The instructions here are based on an [AlmaLinux 9](https://almalinux.org/) base operating system, although they should work identically for any other RHEL9 clone such as [Rocky Linux](https://rockylinux.org/).  Instructions for other linux distributions should be largely similar but there may be some differences.
+
+The requirements for the base OS are:
+
+```
+httpd
+python3
+zip
+```
+
+I'm assuming that your apache(httpd) is already installed and running.
+
+Clone the autoalign repository
+------------------------------
+
+Pick a location into which your want to install the code (```/srv/``` would be a good choice) and then clone the repository to that location with
+
+```
+git clone https://github.com/s-andrews/autoalign.git
+```
+
+Install the additional packages needed
+--------------------------------------
+
+In addition to the base operating system autoalign needs you to install two additional pieces of software
+
+1. [Samtools](http://www.htslib.org/download/)
+2. [Minimap2](https://github.com/lh3/minimap2)
+
+You can install these anywhere on your system as their location will be in the configuration file you set up.  Install instructions for each of the packages is contained within the links above.
+
+
+
+Create a python virtual environment
+-----------------------------------
+
+From within the cloned repository folder run:
+
+```
+python3 -m venv venv
+source venc/bin/activate
+pip3 install -r requirements.txt
+```
+
+Create your config file
+-----------------------
+
+The details of the hosting of your site are contained within the ```autoalign_conf.json``` file in the top folder of the repository.  Edit the values in this file to match the details of your installation.
+
+You will need to provide two folders on your system to hold the data the project creates.  One is for the initial upload, and the second is where the results are served from.  These folders will need to be writeable by whichever user you use to run the program (please don't run it as root - a normal user will work just fine.)
+
+
+Edit your apache configuration
+------------------------------
+
+You need to install a configuration file so that apache knows how to access your system and how to serve the results the program generates.  An example apache conf file is provided in ```autoalign.conf```.  You will need to edit this file to add the actual location from which you will be serving your results files.  The system is set up so that the main inteface is served from ```https://yourdomain.com/autoalign/``` and that results come from ```https://yourdomain.com/autoalign_results/```.  If you want to change this you will need to adjust the configuration file accordingly.  The conf file also assumes that the autoalign web app will be running on local port 5002.  If you need to use a different port you can change the port number in this file also.
+
+Once you have edited the file to match your local setup you can install it by copying it to ```/etc/httpd/conf.d/```, and then restarting your web server with ```systemctl restart httpd```.
+
+Start your web app
+------------------
+
+Once the application is installed you can start it by starting the python venv, and then running the flask application.
+
+```
+cd /srv/autoalign
+source venv/bin/activate
+cd www
+nohup waitress-serve --host 127.0.0.1 --url-prefix="/autoalign/" --port 5002 autoalign:app > /dev/null &
+```
+
+You should now be able to access the application at ```https://yourdomain.com/autoalign/```
+
+
+
+
+
+
+
+
+
 
 
