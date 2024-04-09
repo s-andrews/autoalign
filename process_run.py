@@ -18,6 +18,9 @@ def main():
 
     global config
     config = read_config()
+
+    # Get the execution folder now before we mess things up
+    script_folder = Path(__file__).parent.resolve()
     
     # Move to the folder containing the job files
     if not Path(config["data_folder"]+"/"+job_id).exists():
@@ -53,23 +56,54 @@ def main():
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
 
-
-    fastq_files = job_dir.glob("*fastq.gz")
+    fastq_file = list(job_dir.glob("*fastq.gz"))[0]
 
     aligned_files = []
 
-    for file in fastq_files:
-        bam_file = align_file(file,reference_file)
-        sorted_bam, bam_index = sort_file(bam_file)
-        files_to_move.append(sorted_bam)
-        files_to_move.append(bam_index)
-        aligned_files.append((sorted_bam,bam_index))
+    bam_file = align_file(fastq_file,reference_file)
+    sorted_bam, bam_index = sort_file(bam_file)
+    files_to_move.append(sorted_bam)
+    files_to_move.append(bam_index)
+    aligned_files.append((sorted_bam,bam_index))
+
+    session_file = create_session_file(reference_file,sorted_bam, job_id, script_folder)
+    files_to_move.append(session_file)
 
     # Move the output files to the output directory
     for f in files_to_move:
         Path(f).rename(output_dir / f)
-    
 
+
+def create_session_file(reference,bam,job_id, script_folder):
+    # Read in the template
+    template = script_folder / "webapp_session_template.json"
+
+    print(template)
+
+    session_data = None
+    with open(template,"rt",encoding="utf8") as templatein:
+        session_data = json.load(templatein)
+
+    # We need the sequence id out of the fasta file
+    seqid = ""
+    with open(reference,"rt",encoding="utf8") as infh:
+        seqid = infh.readline().split()[0][1:]
+
+    # Update the template
+    session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
+    session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
+    session_data["locus"] = seqid
+    session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
+    session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
+    session_data["tracks"][1]["filename"] = bam
+    session_data["tracks"][1]["name"] = bam[:-4]
+
+    session_file = "igv_session.json"
+
+    with open(session_file,"wt", encoding="utf8") as out:
+        json.dump(session_data,out)
+
+    return session_file
 
 def index_reference(file):
     index_file = file.name + ".fai"
