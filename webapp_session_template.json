@@ -1,0 +1,25 @@
+{
+	"version": "2.15.11",
+	"showSampleNames": false,
+	"reference": {
+		"fastaURL": "fa_url",
+		"indexURL": "fai_url"
+	},
+	"locus": "",
+	"roi": [],
+	"tracks": [
+		{
+			"type": "sequence",
+			"order": -9007199254740991
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 3
+		}
+	]
+}
