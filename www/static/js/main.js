@@ -18,10 +18,19 @@ function check_files(){
             $("#reference_error").show()
         }
         else {
-            $("#reference_error").hide()
+            // The name is OK, how about the size
+            if ($("#reference")[0].files[0].size > (1024 * 1024 * 1)) {
+                allgood = false
+                $("#reference_error").text("Reference is too big (1MB max)")
+                $("#reference_error").show()    
+            } 
+            else {
+                $("#reference_error").hide()
+            }
         }
     }
     else {
+        // They haven't provided this file yet
         allgood = false
     }
 
@@ -33,8 +42,16 @@ function check_files(){
             $("#fastq_error").text("File did not look like fastq (.fq.gz fastq.gz fq or .fastq)")
             $("#fastq_error").show()
         }
-        else {
-            $("#fastq_error").hide()
+        else {            
+            // The name is OK, how about the size
+            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 1)) {
+                allgood = false
+                $("#fastq_error").text("Fastq file is too big (1MB max)")
+                $("#fastq_error").show()    
+            } 
+            else {
+                $("#fastq_error").hide()
+            }
         }
     }
     else {
