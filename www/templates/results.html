@@ -9,6 +9,11 @@
     <div class="col-md-12"><h2>Results for Job {{ job_id }}</h2></div>
   </div>
   <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-4"><a href="https://igv.org/app/?sessionURL={{ baseurl }}/{{ job_id }}/igv_session.json">View Results in IGV</a></div>
+  </div>
+
+  <div class="row">
     <div class="col-md-6">
       <ul>
         {% for file in files %}
