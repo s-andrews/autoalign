@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Automatic Nanopore Aligner{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 text-center"><a href="{{ url_for('index')}}"><img src="{{ url_for('static', filename='images/autoalign_path.svg') }}" width="40%"></a></div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 text-center darkbg"><h2>Oops - something went wrong</h2></div>
+  </div>
+  <div class="row">
+    <p>
+    Sorry, your job failed to process we have recorded the error below. If it's not obvious what to fix please submit a <a href="https://github.com/s-andrews/autoalign/issues">Bug Report</a> or email <a href="mailto:simon.andrews@babraham.ac.uk">simon.andrews@babraham.ac.uk</a>
+    </p>
+  </div>
+
+  <div class="row">
+    <pre>{{ error }}</pre>
+  </div>
+</div>
+{% endblock %}

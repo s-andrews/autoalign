@@ -40,7 +40,9 @@ def start_alignment():
     fastq_filename = secure_filename(fastq.filename)
     fastq.save(output_path / fastq_filename)
 
-    subprocess.run(["../process_run.py",run_id], check=True)
+    result = subprocess.run(["../process_run.py",run_id], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if result.returncode != 0:
+        return render_template("error.html",error=result.stdout.decode(encoding="utf8"))
 
     return redirect("/view_results/"+run_id)
 
