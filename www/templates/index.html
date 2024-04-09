@@ -6,7 +6,24 @@
     <div class="col-md-12"><h1>Automatic Nanopore Alignments</h1></div>
   </div>
   <div class="row">
-    <div class="col-md-2"></div>
+    <div class="col-md-12 text-center darkbg">
+      <h2>Introduction</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <p>This tool is designed for people who are using targeted nanopore sequencing for the validation of short DNA constructs such as plasmids or PCR products</p>
+      <p>You can upload your reference sequence and a fastq file of nanopore reads.  The reads will then be aligned to the reference using <a href="https://github.com/lh3/minimap2">Minimap2</a> in spliced alignment mode</a> and will return you the bam file of aligned reads.  You will also be given a direct link to the web version of the <a href="https://igv.org/">IGV viewer</a> where you can immediately see your aligned results.</p>
+      <p>Data submitted to this site are not made available other than via the random URL generated when you submit your data.  All data are deleted from our systems one week after they were submitted.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 text-center darkbg">
+      <h2>Upload your data</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3"></div>
     <div class="col-md-6">
         <form action="start_alignment", method="POST", enctype="multipart/form-data">
             <label for="reference">Reference File (Fasta format)</label>

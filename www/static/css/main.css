@@ -4,3 +4,24 @@ label {
     font-size: 150%;
     padding-top: 1em;
 }
+
+#footer {
+    background-color: grey;
+    margin-top:2em;
+    color: white;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+}
+
+#footer a {
+    color: white;
+}
+
+#align {
+    margin-top: 2em !important;
+}
+
+.darkbg {
+    background-color: grey;
+    color: white;
+}
