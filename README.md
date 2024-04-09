@@ -29,6 +29,9 @@ The results of the program are shown in IGV-Web.  You can see more details about
 
 <img src="../main/www/static/images/example_alignment.png?raw=true" alt="Example Alignment" width="100%">
 
+You can see a quick run though of using the program below.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rz4Rcym_wxo?si=elNfNvoxZNOEa1sb" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Hosting your own copy of Auto Align
 ===================================
