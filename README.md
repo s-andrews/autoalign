@@ -1,4 +1,4 @@
-![Auto Align Logo](../main/www/static/images/autoalign_path.svg?raw=true)
+<img src="../main/www/static/images/autoalign_path.svg?raw=true" alt="AutoAlign Logo" width="50%">
 
 Introduction
 ============
