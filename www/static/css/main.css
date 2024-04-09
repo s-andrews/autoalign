@@ -25,3 +25,13 @@ label {
     background-color: grey;
     color: white;
 }
+
+.filelink {
+    color: black;
+    text-decoration: none;
+}
+
+.filelink:hover{
+    color: black;
+    text-decoration: underline;
+}
