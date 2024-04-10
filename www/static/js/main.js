@@ -22,9 +22,9 @@ function check_files(){
         }
         else {
             // The name is OK, how about the size
-            if ($("#reference")[0].files[0].size > (1024 * 1024 * 1)) {
+            if ($("#reference")[0].files[0].size > (1024 * 1024 * 2)) {
                 allgood = false
-                $("#reference_error").text("Reference is too big (1MB max)")
+                $("#reference_error").text("Reference is too big (2MB max)")
                 $("#reference_error").show()    
             } 
             else {
@@ -47,9 +47,9 @@ function check_files(){
         }
         else {            
             // The name is OK, how about the size
-            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 1)) {
+            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 4)) {
                 allgood = false
-                $("#fastq_error").text("Fastq file is too big (1MB max)")
+                $("#fastq_error").text("Fastq file is too big (4MB max)")
                 $("#fastq_error").show()    
             } 
             else {
