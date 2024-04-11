@@ -19,7 +19,8 @@
 			"name": "bam_name",
 			"format": "bam",
 			"type": "alignment",
-			"order": 3
+			"order": 3,
+			"height": 600
 		}
 	]
 }
