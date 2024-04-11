@@ -54,7 +54,13 @@ def start_alignment():
 @app.route("/view_results/<job_id>")
 def view_results(job_id):
 
-    fileit = (Path(server_conf["output_folder"]) / job_id).iterdir()
+    job_folder = (Path(server_conf["output_folder"]) / job_id)
+
+    if not job_folder.exists():
+        # There's no job with this ID.  Send them a sensible message
+        return render_template("error.html",error="Couldn't find this job.\nJobs are deleted after a week so you might need to rerun the alignment")
+
+    fileit = job_folder.iterdir()
     files = []
 
     zip_file = None
