@@ -54,6 +54,13 @@ def start_alignment():
 @app.route("/view_results/<job_id>")
 def view_results(job_id):
 
+    # Since we're showing all of the results in a given folder we
+    # need to be careful about a traversal attack.  The job id 
+    # should just be a bunch of uppercase letters
+    if not (job_id.isalpha() and job_id.isupper()):
+        # This doesn't look like a valid job id so don't even try to do anything with it.
+        return render_template("error.html",error="This doesn't look like a valid job id")
+
     job_folder = (Path(server_conf["output_folder"]) / job_id)
 
     if not job_folder.exists():
