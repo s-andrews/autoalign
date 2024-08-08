@@ -47,9 +47,9 @@ function check_files(){
         }
         else {            
             // The name is OK, how about the size
-            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 4)) {
+            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 10)) {
                 allgood = false
-                $("#fastq_error").text("Fastq file is too big (4MB max)")
+                $("#fastq_error").text("Fastq file is too big (10MB max)")
                 $("#fastq_error").show()    
             } 
             else {

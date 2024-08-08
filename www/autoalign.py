@@ -9,10 +9,10 @@ import json
 import subprocess
 
 app = Flask(__name__)
-# Restrict total request size to 7MB.  We allow 2MB for the
+# Restrict total request size to 20MB.  We allow 2MB for the
 # reference and 4MB for the fastq so this should be plenty
 # for the total payload
-app.config['MAX_CONTENT_LENGTH'] = 7 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 
 
 @app.route("/")
