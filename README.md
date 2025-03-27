@@ -31,7 +31,7 @@ The results of the program are shown in IGV-Web.  You can see more details about
 
 You can see a quick run though of using the program below.
 
-[![AutoAlign video](../main/www/static/images/autoalign_screen.png?raw=true)](https://www.youtube.com/watch?v=rz4Rcym_wxo)
+[![AutoAlign video](../main/www/static/images/autoalign_screen.png?raw=true)](https://youtu.be/cqpuJ8lFOjk?si=9py9V1NQ_mdKEk-h)
 
 Hosting your own copy of Auto Align
 ===================================
