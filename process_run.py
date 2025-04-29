@@ -9,7 +9,7 @@ from pathlib import Path
 import subprocess
 import json
 import os
-import Bio
+from Bio import SeqIO
 
 def main():
     job_id = sys.argv[1]
@@ -59,7 +59,6 @@ def main():
         if file_list:
             reference_file=file_list[0]
             files_to_move.append(reference_file)
-            requires_index = True
             break
 
     if reference_file is None:
@@ -74,6 +73,7 @@ def main():
 
     if annotation_file is not None:
         reference_file = convert_reference(annotation_file)
+        files_to_move.append(reference_file)
 
     if reference_file is None:
         raise Exception("Couldn't find fasta or genbank reference file")
@@ -148,22 +148,15 @@ def create_session_file(reference,annotation,bam,job_id, script_folder):
         seqid = infh.readline().split()[0][1:]
 
     # Update the template
-    if annotation is None:
-        session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
-        session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
-        session_data["locus"] = seqid
-        session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
-        session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
-        session_data["tracks"][1]["filename"] = bam
-        session_data["tracks"][1]["name"] = bam[:-4]
+    session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
+    session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
+    session_data["locus"] = seqid
+    session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
+    session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
+    session_data["tracks"][1]["filename"] = bam
+    session_data["tracks"][1]["name"] = bam[:-4]
 
-    else:
-        session_data["reference"]["gbkURL"] = config["output_url"]+job_id+"/"+annotation.name
-        session_data["locus"] = seqid
-        session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
-        session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
-        session_data["tracks"][1]["filename"] = bam
-        session_data["tracks"][1]["name"] = bam[:-4]
+    if annotation is not None:
         session_data["tracks"][2]["url"] = config["output_url"]+job_id+"/"+annotation.name
 
 
@@ -211,7 +204,7 @@ def convert_reference(file):
     outfile = file
     outfile = Path(".".join(str(file).split(".")[:-1])+".fa")
 
-    Bio.SeqIO.convert(file, "genbank", outfile, "fasta")
+    SeqIO.convert(file, "genbank", outfile, "fasta")
 
     return outfile
 
