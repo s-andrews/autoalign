@@ -15,9 +15,9 @@ function check_files(){
     // Check the reference
     let reffile = $("#reference").val()
     if (reffile) {
-        if (! (reffile.toLowerCase().endsWith(".fa") | reffile.toLowerCase().endsWith(".fasta"))) {
+        if (! (reffile.toLowerCase().endsWith(".fa") | reffile.toLowerCase().endsWith(".fasta") | reffile.toLowerCase().endsWith(".gb") | reffile.toLowerCase().endsWith(".gbk"))) {
             allgood = false
-            $("#reference_error").text("File did not look like fasta (.fa or .fasta)")
+            $("#reference_error").text("File did not look like fasta (.fa or .fasta) or genbank (.gb or .gbk)")
             $("#reference_error").show()
         }
         else {
