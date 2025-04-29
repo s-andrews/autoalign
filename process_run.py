@@ -10,6 +10,8 @@ import subprocess
 import json
 import os
 from Bio import SeqIO
+import gzip
+import pysam
 
 def main():
     job_id = sys.argv[1]
@@ -99,6 +101,11 @@ def main():
     files_to_move.append(bam_index)
     aligned_files.append((sorted_bam,bam_index))
 
+    # We were asked if we could make up a fastq file out of the reads which
+    # didn't align to the reference
+    unaligned_reads = extract_unaligned_reads(fastq_file,bam_file)
+    files_to_move.append(unaligned_reads)
+
     # Before we make the session file we're going to make a zip
     # file of everything we've made so far
     zip_file = create_zip(job_id,files_to_move)
@@ -118,6 +125,49 @@ def main():
         i.unlink()
 
     Path(job_id).rmdir()
+
+def extract_unaligned_reads(fastq_file,bam_file):
+
+    # First go through the BAM file and remember all of the read
+    # IDs which we saw
+
+    bamfh = pysam.AlignmentFile(bam_file, "rb")
+
+    aligned_read_ids = set()
+
+    for read in bamfh.fetch(until_eof=True):
+        aligned_read_ids.add(read.query_name)
+
+
+    unaligned_reads=str(fastq_file)
+    if unaligned_reads.lower().endswith(".gz"):
+        unaligned_reads = unaligned_reads[:-3]
+
+    unaligned_reads = ".".join(unaligned_reads.split(".")[:-1])+"_unaligned.fq.gz"
+    
+    with gzip.open(unaligned_reads,"wt",encoding="utf8") as unaligned_out:
+        if str(fastq_file).lower().endswith(".gz"):
+            fqfh = gzip.open(fastq_file,"rt",encoding="utf8")
+        else:
+            fqfh = open(fastq_file,"rt",encoding="utf8")
+
+
+        for header in fqfh:
+            thisid = header.strip().split()[0][1:]
+            if not thisid in aligned_read_ids:
+                unaligned_out.write(header)
+                unaligned_out.write(fqfh.readline())
+                unaligned_out.write(fqfh.readline())
+                unaligned_out.write(fqfh.readline())
+            else:
+                fqfh.readline()
+                fqfh.readline()
+                fqfh.readline()
+
+        fqfh.close()
+
+
+    return unaligned_reads
 
 def create_zip(job_id,files):
 
