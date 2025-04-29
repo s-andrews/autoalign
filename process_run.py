@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import json
 import os
+import Bio
 
 def main():
     job_id = sys.argv[1]
@@ -51,19 +52,34 @@ def main():
     files_to_move = []
 
     reference_file = None
+    annotation_file = None
+
     for extension in ["*.fa","*.FA","*.fasta","*.FASTA"]:
         file_list = list(job_dir.glob(extension))
         if file_list:
             reference_file=file_list[0]
             files_to_move.append(reference_file)
+            requires_index = True
             break
 
     if reference_file is None:
-        raise Exception("Couldn't find fasta reference file")
+        # We didn't find a fasta file, but they may have included
+        # a genbank file instead which we can process and convert
+        for extension in ["*.gb","*.GB","*.gbk","*.GBK"]:
+            file_list = list(job_dir.glob(extension))
+            if file_list:
+                annotation_file=file_list[0]
+                files_to_move.append(annotation_file)
+                break
+
+    if annotation_file is not None:
+        reference_file = convert_reference(annotation_file)
+
+    if reference_file is None:
+        raise Exception("Couldn't find fasta or genbank reference file")
 
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
-
 
     fastq_file = None
     for extension in ["*.fastq.gz","*.fastq","*.fq.gz","*.fq","*.FASTQ.GZ","*.FASTQ","*.FQ.GZ","*.FQ"]:
@@ -73,6 +89,7 @@ def main():
 
     if fastq_file is None:
         raise Exception("Couldn't find fastq sequence file")
+
 
     aligned_files = []
 
@@ -88,7 +105,7 @@ def main():
     files_to_move.append(zip_file)
 
 
-    session_file = create_session_file(reference_file,sorted_bam, job_id, script_folder)
+    session_file = create_session_file(reference_file,annotation_file,sorted_bam, job_id, script_folder)
     files_to_move.append(session_file)
 
     # Move the output files to the output directory
@@ -112,9 +129,14 @@ def create_zip(job_id,files):
 
     return zip_file
 
-def create_session_file(reference,bam,job_id, script_folder):
+def create_session_file(reference,annotation,bam,job_id, script_folder):
     # Read in the template
-    template = script_folder / "webapp_session_template.json"
+    if annotation is None:
+        # We're doing a straight fasta template
+        template = script_folder / "webapp_session_template_fa.json"
+    else:
+        # We're using a genbank reference
+        template = script_folder / "webapp_session_template_gbk.json"
 
     session_data = None
     with open(template,"rt",encoding="utf8") as templatein:
@@ -126,13 +148,24 @@ def create_session_file(reference,bam,job_id, script_folder):
         seqid = infh.readline().split()[0][1:]
 
     # Update the template
-    session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
-    session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
-    session_data["locus"] = seqid
-    session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
-    session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
-    session_data["tracks"][1]["filename"] = bam
-    session_data["tracks"][1]["name"] = bam[:-4]
+    if annotation is None:
+        session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
+        session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
+        session_data["locus"] = seqid
+        session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
+        session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
+        session_data["tracks"][1]["filename"] = bam
+        session_data["tracks"][1]["name"] = bam[:-4]
+
+    else:
+        session_data["reference"]["gbkURL"] = config["output_url"]+job_id+"/"+annotation.name
+        session_data["locus"] = seqid
+        session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
+        session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
+        session_data["tracks"][1]["filename"] = bam
+        session_data["tracks"][1]["name"] = bam[:-4]
+        session_data["tracks"][2]["url"] = config["output_url"]+job_id+"/"+annotation.name
+
 
     session_file = "igv_session.json"
 
@@ -171,6 +204,16 @@ def align_file(file,reference):
     minimap_proc.wait()
 
     return bam_file
+
+def convert_reference(file):
+    # This is called when we were given a genbank reference and we need to convert
+    # this to fasta so that we can use it for minimap
+    outfile = file
+    outfile = Path(".".join(str(file).split(".")[:-1])+".fa")
+
+    Bio.SeqIO.convert(file, "genbank", outfile, "fasta")
+
+    return outfile
 
 
 def read_config():
