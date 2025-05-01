@@ -43,3 +43,12 @@ h1,h2,h3 {
     font-family: 'Consolas','Courier New', Courier, monospace;
     margin-top: 0.2em;
 }
+
+#plannotatecheck {
+    margin-top: 1.5em;
+    margin-right: 0.5em;
+}
+
+#plannotatelabel {
+    font-size: 120%;
+}

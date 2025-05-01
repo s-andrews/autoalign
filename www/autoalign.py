@@ -37,6 +37,12 @@ def start_alignment():
     files = request.files
     reference = files["reference"]
     fastq = files["fastq"]
+    plannotate = "plannotate" in get_form() and get_form()["plannotate"]
+
+
+    if plannotate:
+        with open(output_path/"reannotate.flag","wt",encoding="utf8"):
+            pass
 
     reference_filename = secure_filename(reference.filename)
     reference.save(output_path / reference_filename)

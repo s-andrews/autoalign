@@ -79,6 +79,12 @@ def main():
 
     if reference_file is None:
         raise Exception("Couldn't find fasta or genbank reference file")
+    
+    ## See if we need to reannotate the reference with plannotate
+    if Path("reannotate.flag").exists():
+        annotation_file = reannotate_file(reference_file)
+        files_to_move.append(annotation_file)
+
 
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
@@ -125,6 +131,35 @@ def main():
         i.unlink()
 
     Path(job_id).rmdir()
+
+def reannotate_file(file):
+    # Uses plannotate to reannotate a reference file
+    
+    # We write to reannotated_temp.gbk initially because plannotate doesn't transfer over
+    # the accession or version information so we don't get the correct name.
+    command = ["conda","run","-n","plannotate","plannotate","batch","-i",str(file),"-f","reannotated_temp","-s",""]
+
+    subprocess.run(command, check=True)
+
+    # Now we need to get the id out of the fasta reference file
+    with open(file,"rt",encoding="utf8") as infh:
+        header = infh.readline()
+        if not header.startswith(">"):
+            raise Exception("Reference fasta didn't start with >")
+        
+        read_id = header.strip().split()[0][1:]
+
+    with open("reannotated_temp.gbk","rt",encoding="utf8") as infh:
+        with open("reannotated.gbk","wt",encoding="utf8") as out:
+            for line in infh:
+                if line.startswith("VERSION") or line.startswith("ACCESSION"):
+                    line = line.replace(".",read_id)
+
+                out.write(line)
+
+
+    return Path("reannotated.gbk")
+
 
 def extract_unaligned_reads(fastq_file,bam_file):
 
