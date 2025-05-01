@@ -85,6 +85,32 @@ source venc/bin/activate
 pip3 install -r requirements.txt
 ```
 
+Install pLannotate
+------------------
+
+We have the option to reannotate reference sequences with [pLannotate](https://github.com/mmcguffi/pLannotate) which can automatically annotate reference sequences with common structures found in plasmids.
+
+Installation happens in two steps:
+
+### Install conda via conda-forge
+Since pLannotate is only available via conda so we first need to install conda via [miniforge](https://conda-forge.org/download/)
+
+Running the script there will walk you through the installation. You don't want to initialise conda by default (it will ask about this).
+
+### Install the pLannotate environment
+Once conda is installed and working you can install pLannotate using
+
+```conda create -n plannotate -c conda-forge -c bioconda plannotate```
+
+You need to do this as the user who will be running the system so the environment is available to them.
+
+Once the environment has installed you can check that it's working with 
+
+```conda run -n plannotate plannotate batch --help```
+
+If that works then you're all good.
+
+
 Create your config file
 -----------------------
 
