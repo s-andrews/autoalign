@@ -7,7 +7,16 @@ $( document ).ready(function() {
     $("#align").css("background-color","lightgrey")
     $("#align").css("border-color","lightgrey")
 
+    $("#align").click(align_pressed)
+
 });
+
+function align_pressed() {
+    $("#align").css("background-color","lightgrey")
+    $("#align").css("border-color","lightgrey")
+    $("#align").html("<span class=\"spinner-border spinner-border-sm\" aria-hidden=\"true\"></span> Running Alignment")
+}
+
 
 function check_files(){
     let allgood = true
