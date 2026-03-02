@@ -39,7 +39,7 @@ def start_alignment():
 
     fastqs = []
     for i in range(1,5):
-        if f"fastq{i}" in files:
+        if f"fastq{i}" in files and files[f"fastq{i}"].filename:
             fastqs.append(files[f"fastq{i}"])
 
     plannotate = "plannotate" in get_form() and get_form()["plannotate"]

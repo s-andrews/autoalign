@@ -237,18 +237,21 @@ def create_session_file(reference,annotation,bam_files,job_id, script_folder):
     with open(reference,"rt",encoding="utf8") as infh:
         seqid = infh.readline().split()[0][1:]
     
+    track_height = int(600/len(bam_files))
+
     # Update the template
     session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
     session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
     session_data["locus"] = seqid
     for i in range(1,6):
         if i>len(bam_files):
-            del session_data["tracks"][i]
+            del session_data["tracks"][len(bam_files)+1]
         else:
             session_data["tracks"][i]["url"] = config["output_url"]+job_id+"/"+bam_files[i-1]
             session_data["tracks"][i]["indexURL"] = config["output_url"]+job_id+"/"+bam_files[i-1]+".bai"
             session_data["tracks"][i]["filename"] = bam_files[i-1]
             session_data["tracks"][i]["name"] = bam_files[i-1][:-4]
+            session_data["tracks"][i]["height"] = track_height
 
     if annotation is not None:
         session_data["tracks"][len(bam_files)+1]["url"] = config["output_url"]+job_id+"/"+annotation.name
