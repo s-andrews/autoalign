@@ -40,7 +40,7 @@ def main():
     output_dir.mkdir()
 
     # We should have a reference sequence file and
-    # a fastq file of reads.
+    # at least one, but potentially up to 5 fastq files of reads.
     # 
     # For now we assume the reference file is fasta.
     # There may be multiple fastq files of reads.
@@ -89,36 +89,41 @@ def main():
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
 
-    fastq_file = None
+    fastq_files = []
     for extension in ["*.fastq.gz","*.fastq","*.fq.gz","*.fq","*.FASTQ.GZ","*.FASTQ","*.FQ.GZ","*.FQ"]:
         file_list = list(job_dir.glob(extension))
         if file_list:
-            fastq_file = file_list[0]
+            for fastq_file in file_list:
+                fastq_files.append(fastq_file)
 
-    if fastq_file is None:
+    if not fastq_files:
         raise Exception("Couldn't find fastq sequence file")
 
+    if len(fastq_files) > 5:
+        raise Exception("More than 5 fastq files found")
 
     aligned_files = []
+    sorted_bam_files = []
 
-    bam_file = align_file(fastq_file,reference_file)
-    sorted_bam, bam_index = sort_file(bam_file)
-    files_to_move.append(sorted_bam)
-    files_to_move.append(bam_index)
-    aligned_files.append((sorted_bam,bam_index))
+    for fastq_file in fastq_files:
+        bam_file = align_file(fastq_file,reference_file)
+        sorted_bam, bam_index = sort_file(bam_file)
+        sorted_bam_files.append(sorted_bam)
+        files_to_move.append(sorted_bam)
+        files_to_move.append(bam_index)
+        aligned_files.append((sorted_bam,bam_index))
 
-    # We were asked if we could make up a fastq file out of the reads which
-    # didn't align to the reference
-    unaligned_reads = extract_unaligned_reads(fastq_file,bam_file)
-    files_to_move.append(unaligned_reads)
+        # We were asked if we could make up a fastq file out of the reads which
+        # didn't align to the reference
+        unaligned_reads = extract_unaligned_reads(fastq_file,bam_file)
+        files_to_move.append(unaligned_reads)
 
     # Before we make the session file we're going to make a zip
     # file of everything we've made so far
     zip_file = create_zip(job_id,files_to_move)
     files_to_move.append(zip_file)
 
-
-    session_file = create_session_file(reference_file,annotation_file,sorted_bam, job_id, script_folder)
+    session_file = create_session_file(reference_file,annotation_file,sorted_bam_files, job_id, script_folder)
     files_to_move.append(session_file)
 
     # Move the output files to the output directory
@@ -214,7 +219,7 @@ def create_zip(job_id,files):
 
     return zip_file
 
-def create_session_file(reference,annotation,bam,job_id, script_folder):
+def create_session_file(reference,annotation,bam_files,job_id, script_folder):
     # Read in the template
     if annotation is None:
         # We're doing a straight fasta template
@@ -231,18 +236,22 @@ def create_session_file(reference,annotation,bam,job_id, script_folder):
     seqid = ""
     with open(reference,"rt",encoding="utf8") as infh:
         seqid = infh.readline().split()[0][1:]
-
+    
     # Update the template
     session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
     session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
     session_data["locus"] = seqid
-    session_data["tracks"][1]["url"] = config["output_url"]+job_id+"/"+bam
-    session_data["tracks"][1]["indexURL"] = config["output_url"]+job_id+"/"+bam+".bai"
-    session_data["tracks"][1]["filename"] = bam
-    session_data["tracks"][1]["name"] = bam[:-4]
+    for i in range(1,6):
+        if i>len(bam_files):
+            del session_data["tracks"][i]
+        else:
+            session_data["tracks"][i]["url"] = config["output_url"]+job_id+"/"+bam_files[i-1]
+            session_data["tracks"][i]["indexURL"] = config["output_url"]+job_id+"/"+bam_files[i-1]+".bai"
+            session_data["tracks"][i]["filename"] = bam_files[i-1]
+            session_data["tracks"][i]["name"] = bam_files[i-1][:-4]
 
     if annotation is not None:
-        session_data["tracks"][2]["url"] = config["output_url"]+job_id+"/"+annotation.name
+        session_data["tracks"][len(bam_files)+1]["url"] = config["output_url"]+job_id+"/"+annotation.name
 
 
     session_file = "igv_session.json"

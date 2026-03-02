@@ -1,7 +1,7 @@
 $( document ).ready(function() {
     console.log("Setting up")
     $("#reference").change(check_files)
-    $("#fastq").change(check_files)
+    $(".fastq").change(check_files)
 
     $("#align").prop("disabled",true)
     $("#align").css("background-color","lightgrey")
@@ -9,7 +9,28 @@ $( document ).ready(function() {
 
     $("#align").click(align_pressed)
 
+    $("#moreseq").click(add_more_sequences)
+
 });
+
+function add_more_sequences() {
+
+    // We need to find how many sequences are still available
+    let nextfq = 6 - $("input.fqhidden").length
+
+    // Make these visible
+    $("#fqlabel"+nextfq).removeClass("fqhidden")
+    $("#fastq"+nextfq).removeClass("fqhidden")
+    $("#fastq_error"+nextfq).removeClass("fqhidden")
+
+    if (nextfq == 5) {
+        $("#moreseq").hide()
+    }
+
+    return(false)
+
+}
+
 
 function align_pressed() {
     $("#align").css("background-color","lightgrey")
@@ -19,6 +40,7 @@ function align_pressed() {
 
 
 function check_files(){
+    console.log("Checking files")
     let allgood = true
 
     // Check the reference
@@ -46,27 +68,46 @@ function check_files(){
         allgood = false
     }
 
-    // Check the fastq
-    let fastqfile = $("#fastq").val()
-    if (fastqfile) {
-        if (! (fastqfile.toLowerCase().endsWith(".fq.gz") | fastqfile.toLowerCase().endsWith(".fastq.gz") | fastqfile.toLowerCase().endsWith(".fq") | fastqfile.toLowerCase().endsWith(".fastq"))) {
-            allgood = false
-            $("#fastq_error").text("File did not look like fastq (.fq.gz fastq.gz fq or .fastq)")
-            $("#fastq_error").show()
-        }
-        else {            
-            // The name is OK, how about the size
-            if ($("#fastq")[0].files[0].size > (1024 * 1024 * 10)) {
+    // Check the fastq files - there may be up to 5
+    let good_fastq = false
+
+    let seen_names = []
+
+    for (let i=1;i<=5;i++) {
+        let fastqfile = $("#fastq"+i).val()
+        if (fastqfile) {
+            if (! (fastqfile.toLowerCase().endsWith(".fq.gz") | fastqfile.toLowerCase().endsWith(".fastq.gz") | fastqfile.toLowerCase().endsWith(".fq") | fastqfile.toLowerCase().endsWith(".fastq"))) {
                 allgood = false
-                $("#fastq_error").text("Fastq file is too big (10MB max)")
-                $("#fastq_error").show()    
-            } 
-            else {
-                $("#fastq_error").hide()
+                $("#fastq_error"+i).text("File did not look like fastq (.fq.gz fastq.gz fq or .fastq)")
+                $("#fastq_error"+i).show()
+            }
+            else {            
+                // The name is OK, how about the size
+                if ($("#fastq"+i)[0].files[0].size > (1024 * 1024 * 10)) {
+                    allgood = false
+                    $("#fastq_error"+i).text("Fastq file is too big (10MB max)")
+                    $("#fastq_error"+i).show()    
+                } 
+                else {
+
+                    // Check for duplicate names
+                    if (seen_names.includes(fastqfile)) {
+                        allgood = false
+                        $("#fastq_error"+i).text("Duplicate file name")
+                        $("#fastq_error"+i).show()    
+                    }
+                    else {
+                        seen_names.push(fastqfile)
+                        $("#fastq_error"+i).hide()
+                        good_fastq = true
+                    }
+                }
             }
         }
     }
-    else {
+
+    if (!good_fastq) {
+        // There are no fastq files selected
         allgood = false
     }
 

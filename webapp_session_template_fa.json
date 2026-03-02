@@ -21,6 +21,46 @@
 			"type": "alignment",
 			"order": 3,
 			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 4,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 5,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 6,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 7,
+			"height": 600
 		}
 	]
 }

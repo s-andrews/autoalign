@@ -36,7 +36,12 @@ def start_alignment():
 
     files = request.files
     reference = files["reference"]
-    fastq = files["fastq"]
+
+    fastqs = []
+    for i in range(1,5):
+        if f"fastq{i}" in files:
+            fastqs.append(files[f"fastq{i}"])
+
     plannotate = "plannotate" in get_form() and get_form()["plannotate"]
 
 
@@ -47,8 +52,9 @@ def start_alignment():
     reference_filename = secure_filename(reference.filename)
     reference.save(output_path / reference_filename)
 
-    fastq_filename = secure_filename(fastq.filename)
-    fastq.save(output_path / fastq_filename)
+    for fastq in fastqs:
+        fastq_filename = secure_filename(fastq.filename)
+        fastq.save(output_path / fastq_filename)
 
     result = subprocess.run(["../process_run.py",run_id], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if result.returncode != 0:

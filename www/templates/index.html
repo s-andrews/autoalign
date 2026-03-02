@@ -24,9 +24,7 @@
   </div>
   <div class="row">
     <div class="alert alert-warning" role="alert">
-      NEWS: We've added support for using annotated genbank format references
-      <br>
-      NEWS: You can now automatically annotate your reference using <a href="https://github.com/mmcguffi/pLannotate">pLannotate</a> 
+      NEWS: You can now process up to 5 fastq files in a single run
     </div>
   </div>
   <div class="row">
@@ -36,9 +34,29 @@
             <label for="reference">Reference File (Fasta or Genbank format)</label>
             <input class="form-control" name="reference" type="file" id="reference">
             <div id="reference_error" class="invalid-feedback">Text</div>
-            <label for="fastq">Sequencing File (fastq.gz format)</label>
-            <input class="form-control" type="file" name="fastq" id="fastq">
-            <div id="fastq_error" class="invalid-feedback"></div>
+
+            <label id="fqlabel1" for="fastq1">Sequencing File 1 (fastq.gz format)</label>
+            <input class="form-control fastq" type="file" name="fastq1" id="fastq1">
+            <div id="fastq_error1" class="invalid-feedback"></div>
+
+            <label id="fqlabel2" for="fastq2" class="fqhidden">Sequencing File 2 (fastq.gz format)</label>
+            <input class="form-control fqhidden fastq" type="file" name="fastq2" id="fastq2">
+            <div id="fastq_error2" class="invalid-feedback fqhidden"></div>
+
+            <label id="fqlabel3" for="fastq3" class="fqhidden">Sequencing File 3 (fastq.gz format)</label>
+            <input class="form-control fqhidden fastq" type="file" name="fastq3" id="fastq3">
+            <div id="fastq_error3" class="invalid-feedback fqhidden"></div>
+
+            <label id="fqlabel4" for="fastq4" class="fqhidden">Sequencing File 4 (fastq.gz format)</label>
+            <input class="form-control fqhidden fastq" type="file" name="fastq4" id="fastq4">
+            <div id="fastq_error4" class="invalid-feedback fqhidden"></div>
+
+            <label id="fqlabel5" for="fastq5" class="fqhidden">Sequencing File 5 (fastq.gz format)</label>
+            <input class="form-control fqhidden fastq" type="file" name="fastq5" id="fastq5">
+            <div id="fastq_error5" class="invalid-feedback fqhidden"></div>
+
+            <button class="btn btn-primary btn-sm mt-2" id="moreseq">Add More Sequences</button>
+
             <div>
               <input class="form-check-input" type="checkbox" name="plannotate" id="plannotatecheck">
               <label id="plannotatelabel" class="form-check-label" for="plannotatecheck">Reannotate reference with <a href="https://github.com/mmcguffi/pLannotate">pLannotate</a></label>  

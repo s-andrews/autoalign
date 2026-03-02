@@ -22,11 +22,51 @@
 			"order": 3,
 			"height": 400
 		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 4,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 5,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 6,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 7,
+			"height": 400
+		},
         {
             "name": "Annotations",
             "format": "gbk",
             "url": "gbk_url",
-            "order": 4,
+            "order": 8,
             "type": "annotation",
             "height": 200
         }
