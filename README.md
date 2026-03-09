@@ -12,8 +12,10 @@ The program here will undertake the following operations
 1. Generate a fasta index file from the reference sequence
 2. Align each fastq file to the reference using minimap2
 3. Sort and index the BAM files produced using samtools
-4. Place the resulting files in a web-accesible directory
-5. Create an IGV config file which will open a session to view the alignments
+4. [Optionally] Reannotate the reference sequence using [Plannotate](https://github.com/mmcguffi/pLannotate)
+5. Convert annotation files to GFFv3 for better IGV compatibility
+6. Place the resulting files in a web-accesible directory
+7. Create an IGV config file which will open a session to view the alignments
 
 
 Using Auto Align
