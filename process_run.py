@@ -181,7 +181,16 @@ def reannotate_file(file):
     # the accession or version information so we don't get the correct name.
     command = ["conda","run","-n","plannotate","plannotate","batch","-i",str(file),"-f","reannotated_temp","-s",""]
 
-    subprocess.run(command, check=True)
+    # Plannotate isn't super quick, but we want to put some limits on how long
+    # we're going to let it run.  We'll therefore kill any processes which go
+    # over 5 mins.
+
+    try:
+        subprocess.run(command, check=True, timeout=600)
+
+    except subprocess.TimeoutExpired:
+        print("Plannotate took more than 5 mins to run and was killed - it should have finished in this time", flush=True)
+        sys.exit(1)
 
     # Now we need to get the id out of the fasta reference file
     with open(file,"rt",encoding="utf8") as infh:
@@ -274,7 +283,12 @@ def create_session_file(reference,annotation,bam_files,job_id, script_folder):
     with open(reference,"rt",encoding="utf8") as infh:
         seqid = infh.readline().split()[0][1:]
     
-    track_height = int(600/len(bam_files))
+    data_track_total_height = 650
+
+    if annotation is not None:
+        data_track_total_height = 500
+
+    track_height = int(data_track_total_height/len(bam_files))
 
     # Update the template
     session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
