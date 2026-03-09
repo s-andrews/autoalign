@@ -30,15 +30,13 @@ def main():
 
     print(f"Started processing job {job_id} at {datetime.datetime.now()}", flush=True)
 
-    for i in range(10):
-        print(f"Sleeping to test {i+1}", flush=True)
-        time.sleep(5)
-
-
     # Get the execution folder now before we mess things up
     script_folder = Path(__file__).parent.resolve()
     
     # Move to the folder containing the job files
+
+    print(f"Moving to job folder", flush=True)
+
     if not Path(config["data_folder"]+"/"+job_id).exists():
         raise Exception(f"Couldn't find job {job_id}")
     
@@ -50,6 +48,7 @@ def main():
         raise Exception(f"Output dir already exists for {job_id}")
 
     # Create the output directory
+    print(f"Making output folder", flush=True)
     output_dir.mkdir()
 
     # We should have a reference sequence file and
@@ -66,6 +65,9 @@ def main():
     # output directory
     files_to_move = []
 
+    # We always want the log file
+    files_to_move.append(job_dir/"process_log.txt")
+
     reference_file = None
     annotation_file = None
 
@@ -73,6 +75,7 @@ def main():
         file_list = list(job_dir.glob(extension))
         if file_list:
             reference_file=file_list[0]
+            print(f"Found reference file{file_list[0].name}", flush=True)
             files_to_move.append(reference_file)
             break
 
@@ -83,6 +86,7 @@ def main():
             file_list = list(job_dir.glob(extension))
             if file_list:
                 annotation_file=file_list[0]
+                print(f"Found reference file{file_list[0].name}", flush=True)
                 files_to_move.append(annotation_file)
                 break
 
@@ -108,6 +112,8 @@ def main():
         if file_list:
             for fastq_file in file_list:
                 fastq_files.append(fastq_file)
+                print(f"Found fastq file{fastq_file.name}", flush=True)
+
 
     if not fastq_files:
         raise Exception("Couldn't find fastq sequence file")
@@ -119,7 +125,9 @@ def main():
     sorted_bam_files = []
 
     for fastq_file in fastq_files:
+        print(f"Aligning {fastq_file.name} to {reference_file.name}", flush=True)
         bam_file = align_file(fastq_file,reference_file)
+        print(f"Sorting {bam_file}", flush=True)
         sorted_bam, bam_index = sort_file(bam_file)
         sorted_bam_files.append(sorted_bam)
         files_to_move.append(sorted_bam)
@@ -128,30 +136,40 @@ def main():
 
         # We were asked if we could make up a fastq file out of the reads which
         # didn't align to the reference
+        print(f"Extracting unaligned reads from {bam_file}", flush=True)
         unaligned_reads = extract_unaligned_reads(fastq_file,bam_file)
         files_to_move.append(unaligned_reads)
 
     # Before we make the session file we're going to make a zip
     # file of everything we've made so far
+    print(f"Creating zip file of all data", flush=True)
     zip_file = create_zip(job_id,files_to_move)
     files_to_move.append(zip_file)
 
+    print(f"Making IGV session file", flush=True)
     session_file = create_session_file(reference_file,annotation_file,sorted_bam_files, job_id, script_folder)
     files_to_move.append(session_file)
 
     # Move the output files to the output directory
     for f in files_to_move:
+        print(f"Moving {f} to output directory", flush=True)
         Path(f).rename(output_dir / f)
 
     # Remove the content of the processing directory - we don't need it any more
     os.chdir("..")
+    print(f"Removing working directory", flush=True)
     for i in Path(job_id).iterdir():
         i.unlink()
 
     Path(job_id).rmdir()
 
+    print(f"Finished processing job {job_id} at {datetime.datetime.now()}", flush=True)
+
+
 def reannotate_file(file):
     # Uses plannotate to reannotate a reference file
+    print(f"Reannotating reference with plannotate", flush=True)
+
     
     # We write to reannotated_temp.gbk initially because plannotate doesn't transfer over
     # the accession or version information so we don't get the correct name.
@@ -302,15 +320,32 @@ def align_file(file,reference):
         if v.lower() == "fq" or v.lower() == "fastq":
             bam_file = ".".join(sections[0:i])+".bam"
 
-    minimap_proc = subprocess.Popen([config["minimap2"],"-ax","splice",reference.name,file.name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    subprocess.run([config["samtools"],"view","-bS","-q","10","-o",bam_file], stdin=minimap_proc.stdout)
-    minimap_proc.wait()
+    minimap_proc = subprocess.Popen(
+        [config["minimap2"],"-ax","splice",reference.name,file.name], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.DEVNULL
+    )
+    subprocess.Popen(
+        [config["samtools"],"view","-bS","-q","10","-o",bam_file], 
+        stdin=minimap_proc.stdout
+    )
+
+    minimap_proc.stdout.close()
+
+    try:
+        minimap_proc.wait(timeout=60)
+
+    except subprocess.TimeoutExpired:
+        print(f"Minimap alignment of {file.name} to {reference.name} took more than 60 secs and was killed", file=sys.stderr, flush=True)
+        sys.exit(1)
 
     return bam_file
 
 def convert_reference(file):
     # This is called when we were given a genbank reference and we need to convert
     # this to fasta so that we can use it for minimap
+    print(f"Converting reference to fasta", flush=True)
+
     outfile = file
     outfile = Path(".".join(str(file).split(".")[:-1])+".fa")
 

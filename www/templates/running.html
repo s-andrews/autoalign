@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Automatic Nanopore Aligner{% endblock %}
+{% block head %}
+<meta http-equiv="refresh" content="10">
+{% endblock %}
 {% block content %}
 <div class="container-fluid">
   <div class="row">
@@ -15,6 +18,8 @@
     <p>
     If you think the log shows that the job failed then you shouldn't be seeing this message, so please submit a <a href="https://github.com/s-andrews/autoalign/issues">Bug Report</a> or email <a href="mailto:simon.andrews@babraham.ac.uk">simon.andrews@babraham.ac.uk</a>
     </p>
+
+    <p>This page will refresh automatically and will show your results when they're ready.</p>
   </div>
 
   <div class="row">

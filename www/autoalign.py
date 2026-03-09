@@ -7,6 +7,7 @@ from urllib.parse import quote_plus
 from pathlib import Path
 import json
 import subprocess
+import time
 
 app = Flask(__name__)
 # Restrict total request size to 20MB.  We allow 2MB for the
@@ -77,6 +78,9 @@ def start_alignment():
     # we'll have to figure out if the processing has finished or if 
     # something went wrong.
 
+    # We'll give it a second to start the output process
+    time.sleep(1)
+
     return redirect(url_for("view_results",job_id=run_id))
 
 
@@ -116,10 +120,15 @@ def view_results(job_id):
         log_text = "Nothing in the log file yet..."
 
         if log_file.exists():
-            log_text = ""
+            new_log = True
 
             with open(log_file,"rt", encoding="utf8") as infh:
                 for line in infh:
+
+                    if new_log:
+                        log_text = ""
+                        new_log = False
+
                     log_text += line
 
 
