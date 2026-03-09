@@ -91,7 +91,7 @@ def main():
                 break
 
     if annotation_file is not None:
-        reference_file = convert_reference(annotation_file)
+        reference_file = convert_reference_to_fasta(annotation_file)
         files_to_move.append(reference_file)
 
     if reference_file is None:
@@ -102,6 +102,12 @@ def main():
         annotation_file = reannotate_file(reference_file)
         files_to_move.append(annotation_file)
 
+
+    ## IGV is rubbish at displaying genbank reference files so we're going
+    ## to convert to GFF3 which is better supported.
+    if annotation_file is not None:
+        annotation_file = convert_annotation_to_gff3(annotation_file)
+        files_to_move.append(annotation_file)
 
     reference_index = index_reference(reference_file)
     files_to_move.append(reference_index)
@@ -257,7 +263,7 @@ def create_session_file(reference,annotation,bam_files,job_id, script_folder):
         template = script_folder / "webapp_session_template_fa.json"
     else:
         # We're using a genbank reference
-        template = script_folder / "webapp_session_template_gbk.json"
+        template = script_folder / "webapp_session_template_gff3.json"
 
     session_data = None
     with open(template,"rt",encoding="utf8") as templatein:
@@ -341,7 +347,7 @@ def align_file(file,reference):
 
     return bam_file
 
-def convert_reference(file):
+def convert_reference_to_fasta(file):
     # This is called when we were given a genbank reference and we need to convert
     # this to fasta so that we can use it for minimap
     print(f"Converting reference to fasta", flush=True)
@@ -352,6 +358,78 @@ def convert_reference(file):
     SeqIO.convert(file, "genbank", outfile, "fasta")
 
     return outfile
+
+
+def get_best_label(feature):
+    """Choose the best label for IGV display."""
+    q = feature.qualifiers
+
+    for key in ["label", "gene", "locus_tag", "product", "note"]:
+        if key in q:
+            return feature.type + ": "+q[key][0]
+
+    return feature.type
+
+
+def convert_annotation_to_gff3(annotation_file):
+    print(f"Converting reference features to GFF3", flush=True)
+
+    gff_file = Path(str(annotation_file).replace(".gb","")+".gff3")
+    print(f"Making {gff_file}", flush=True)
+
+    with open(gff_file, "w") as out:
+        out.write("##gff-version 3\n")
+
+        for record in SeqIO.parse(annotation_file, "genbank"):
+
+            seqid = record.id
+
+            for i, feature in enumerate(record.features):
+
+                if feature.location is None:
+                    continue
+
+                start = int(feature.location.start) + 1
+                end = int(feature.location.end)
+                strand = "+" if feature.location.strand == 1 else "-"
+
+                ftype = feature.type
+
+                if ftype == "source":
+                    continue
+
+                label = get_best_label(feature)
+                fid = f"{ftype}_{i}"
+
+                attributes = [
+                    f"ID={fid}",
+                    f"Name={label}"
+                ]
+
+                # also include gene/locus_tag if present
+                if "gene" in feature.qualifiers:
+                    attributes.append(f"gene={feature.qualifiers['gene'][0]}")
+
+                if "locus_tag" in feature.qualifiers:
+                    attributes.append(f"locus_tag={feature.qualifiers['locus_tag'][0]}")
+
+                attr_string = ";".join(attributes)
+
+                gff_line = "\t".join([
+                    seqid,
+                    "GenBank",
+                    ftype,
+                    str(start),
+                    str(end),
+                    ".",
+                    strand,
+                    ".",
+                    attr_string
+                ])
+
+                out.write(gff_line + "\n")
+    
+    return gff_file
 
 
 def read_config():
