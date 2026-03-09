@@ -12,6 +12,12 @@ import os
 from Bio import SeqIO
 import gzip
 import pysam
+import datetime
+import time
+
+# For the log file we want all output to be written immediately.
+import sys
+sys.stdout.reconfigure(write_through=True)
 
 def main():
     job_id = sys.argv[1]
@@ -21,6 +27,13 @@ def main():
 
     global config
     config = read_config()
+
+    print(f"Started processing job {job_id} at {datetime.datetime.now()}", flush=True)
+
+    for i in range(10):
+        print(f"Sleeping to test {i+1}", flush=True)
+        time.sleep(5)
+
 
     # Get the execution folder now before we mess things up
     script_folder = Path(__file__).parent.resolve()

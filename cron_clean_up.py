@@ -36,6 +36,8 @@ print("Output Deletion cutoff is ",cutoff)
 
 for folder in Path(conf["output_folder"]).iterdir():
     if folder.is_dir():
+        if folder.name == "CHARMTX" or folder.name == "Suzan":
+            continue
         creation_time = datetime.datetime.fromtimestamp(folder.stat().st_ctime)
         if creation_time < cutoff:
             print("Deleting ",folder,"from",creation_time)

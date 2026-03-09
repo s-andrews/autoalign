@@ -56,15 +56,36 @@ def start_alignment():
         fastq_filename = secure_filename(fastq.filename)
         fastq.save(output_path / fastq_filename)
 
-    result = subprocess.run(["../process_run.py",run_id], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if result.returncode != 0:
-        return render_template("error.html",error=result.stdout.decode(encoding="utf8"))
 
-    return redirect("/view_results/"+run_id)
+    # We want to launch the process to do the analysis. We're 
+    # using a shell wrapper so that we can send all output into
+    # a log file, and we can write the exit code to a file once
+    # the process completes.
+
+    subprocess.Popen(
+        [
+            "bash",
+            "-c",
+            f"PYTHONUNBUFFERED=1 ../process_run.py {run_id} > {str(output_path/'process_log.txt')} 2>&1; echo $? > {str(output_path/'exit_code.txt')}"
+        ],
+        stdout = subprocess.DEVNULL,
+        stderr = subprocess.DEVNULL,
+        start_new_session = True
+    )
+
+    # We send them straight to the results viewing route.  Inside there
+    # we'll have to figure out if the processing has finished or if 
+    # something went wrong.
+
+    return redirect(url_for("view_results",job_id=run_id))
 
 
 @app.route("/view_results/<job_id>")
 def view_results(job_id):
+
+    # When this function is called the analysis may or may not have
+    # actually finished.  We'll check the job folder for some key
+    # files to see if it worked or not.
 
     # Since we're showing all of the results in a given folder we
     # need to be careful about a traversal attack.  The job id 
@@ -73,13 +94,56 @@ def view_results(job_id):
         # This doesn't look like a valid job id so don't even try to do anything with it.
         return render_template("error.html",error="This doesn't look like a valid job id")
 
-    job_folder = (Path(server_conf["output_folder"]) / job_id)
+    # We could have data in the processing folder or the output folder
 
-    if not job_folder.exists():
+    process_folder = (Path(server_conf["data_folder"]) / job_id)
+
+    output_folder = (Path(server_conf["output_folder"]) / job_id)
+
+    if not (process_folder.exists() or output_folder.exists()):
         # There's no job with this ID.  Send them a sensible message
         return render_template("error.html",error="Couldn't find this job.\nJobs are deleted after a week so you might need to rerun the alignment")
 
-    fileit = job_folder.iterdir()
+
+    # If the process folder is still there then either the job is still running
+    # or it failed.
+
+    if process_folder.exists():
+
+        # We want the text from the log whatever happens
+        log_file = process_folder / "process_log.txt"
+
+        log_text = "Nothing in the log file yet..."
+
+        if log_file.exists():
+            log_text = ""
+
+            with open(log_file,"rt", encoding="utf8") as infh:
+                for line in infh:
+                    log_text += line
+
+
+        # We need to determine if it finished, or crashed.
+        exit_code_file = process_folder / "exit_code.txt"
+        if not exit_code_file.exists():
+            # It hasn't started yet or is still running
+            return render_template("running.html",log=log_text)
+
+        # We can try to read what's in the exit code file
+        with open(exit_code_file,"rt",encoding="utf8") as infh:
+            exit_code = infh.readline().strip()
+
+            if exit_code and exit_code != "0":
+                # It crashed
+                return render_template("error.html", error=log_text)
+            
+            else:
+                # It looks like it's still running
+                return render_template("running.html",log=log_text)
+            
+    # If we get here then the job is finished, so we'll just output the results
+
+    fileit = output_folder.iterdir()
     files = []
 
     zip_file = None

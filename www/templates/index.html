@@ -30,7 +30,7 @@
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-        <form action="start_alignment", method="POST", enctype="multipart/form-data">
+        <form action="{{ url_for('start_alignment')}}", method="POST", enctype="multipart/form-data">
             <label for="reference">Reference File (Fasta or Genbank format)</label>
             <input class="form-control" name="reference" type="file" id="reference">
             <div id="reference_error" class="invalid-feedback">Text</div>

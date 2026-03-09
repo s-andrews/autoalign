@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Automatic Nanopore Aligner{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 text-center"><a href="{{ url_for('index')}}"><img src="{{ url_for('static', filename='images/autoalign_path.svg') }}" width="40%"></a></div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 text-center darkbg"><h2>Your job is still running...</h2></div>
+  </div>
+  <div class="row">
+    <p>
+    Your job is still running.  Normally jobs finish within a few seconds, but occasionally there are lots of jobs running or something takes longer than expected.  The log file your job has produced is shown below. 
+    </p>
+    <p>
+    If you think the log shows that the job failed then you shouldn't be seeing this message, so please submit a <a href="https://github.com/s-andrews/autoalign/issues">Bug Report</a> or email <a href="mailto:simon.andrews@babraham.ac.uk">simon.andrews@babraham.ac.uk</a>
+    </p>
+  </div>
+
+  <div class="row">
+    <pre>{{ log }}</pre>
+  </div>
+</div>
+{% endblock %}
