@@ -53,9 +53,9 @@ function check_files(){
         }
         else {
             // The name is OK, how about the size
-            if ($("#reference")[0].files[0].size > (1024 * 1024 * 2)) {
+            if ($("#reference")[0].files[0].size > (1024 * 1024 * 10)) {
                 allgood = false
-                $("#reference_error").text("Reference is too big (2MB max)")
+                $("#reference_error").text("Reference is too big (10MB max)")
                 $("#reference_error").show()    
             } 
             else {
@@ -71,36 +71,72 @@ function check_files(){
     // Check the fastq files - there may be up to 5
     let good_fastq = false
 
-    let seen_names = []
+    // We might not need any fastq files - if we're being given a nanosplit code
+    // then that's enough and we just assume that the fastq files there will
+    // be OK.
 
-    for (let i=1;i<=5;i++) {
-        let fastqfile = $("#fastq"+i).val()
-        if (fastqfile) {
-            if (! (fastqfile.toLowerCase().endsWith(".fq.gz") | fastqfile.toLowerCase().endsWith(".fastq.gz") | fastqfile.toLowerCase().endsWith(".fq") | fastqfile.toLowerCase().endsWith(".fastq"))) {
-                allgood = false
-                $("#fastq_error"+i).text("File did not look like fastq (.fq.gz fastq.gz fq or .fastq)")
-                $("#fastq_error"+i).show()
-            }
-            else {            
-                // The name is OK, how about the size
-                if ($("#fastq"+i)[0].files[0].size > (1024 * 1024 * 10)) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("nanosplit")) {
+        good_fastq = true
+    }
+
+    else {
+        // We need to check the file fields.
+
+        let seen_names = []
+
+        // We're going to let them have 100MB total.  This may be 
+        // split across the 5 files, so at least 20MB per file, but
+        // they can have more if they're only using one or two
+
+        let total_file_size = 0
+
+        for (let i=1;i<=5;i++) {
+            let fastqfile = $("#fastq"+i).val()
+            if (fastqfile) {
+                if (! (fastqfile.toLowerCase().endsWith(".fq.gz") | fastqfile.toLowerCase().endsWith(".fastq.gz") | fastqfile.toLowerCase().endsWith(".fq") | fastqfile.toLowerCase().endsWith(".fastq"))) {
                     allgood = false
-                    $("#fastq_error"+i).text("Fastq file is too big (10MB max)")
-                    $("#fastq_error"+i).show()    
-                } 
-                else {
-
-                    // Check for duplicate names
-                    if (seen_names.includes(fastqfile)) {
+                    $("#fastq_error"+i).text("File did not look like fastq (.fq.gz fastq.gz fq or .fastq)")
+                    $("#fastq_error"+i).show()
+                }
+                else {            
+                    // The name is OK, how about the size
+                    if ($("#fastq"+i)[0].files[0].size > (1024 * 1024 * 100)) {
                         allgood = false
-                        $("#fastq_error"+i).text("Duplicate file name")
-                        $("#fastq_error"+i).show()    
-                    }
+                        $("#fastq_error"+i).text("Fastq file is too big (100MB max)")
+                        $("#fastq_error"+i).show()                    
+                    } 
                     else {
-                        seen_names.push(fastqfile)
-                        $("#fastq_error"+i).hide()
-                        good_fastq = true
+                        // We record the total file size for later
+                        total_file_size += $("#fastq"+i)[0].files[0].size / (1024*1024)
+
+                        // Check for duplicate names
+                        if (seen_names.includes(fastqfile)) {
+                            allgood = false
+                            $("#fastq_error"+i).text("Duplicate file name")
+                            $("#fastq_error"+i).show()    
+                        }
+                        else {
+                            seen_names.push(fastqfile)
+                            $("#fastq_error"+i).hide()
+                            good_fastq = true
+                        }
                     }
+                }
+            }
+        }
+
+        // Check the total file size
+        if (total_file_size > 100) {
+            allgood = false
+
+            for (let i=1;i<=5;i++) {
+                let fastqfile = $("#fastq"+i).val()
+                if (fastqfile) {
+                    let this_size = Math.floor($("#fastq"+i)[0].files[0].size / (1024*1024))
+                    $("#fastq_error"+i).text("Total fastq size is too big (100MB max) - this is "+this_size+" MB")
+                    $("#fastq_error"+i).show()
+
                 }
             }
         }

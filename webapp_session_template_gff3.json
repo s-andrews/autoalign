@@ -62,11 +62,61 @@
 			"order": 7,
 			"height": 400
 		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 8,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 9,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 10,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 11,
+			"height": 400
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 12,
+			"height": 400
+		},
         {
             "name": "Annotations",
             "format": "gff3",
             "url": "gff3_url",
-            "order": 8,
+            "order": 13,
             "type": "annotation",
             "height": 200
         }

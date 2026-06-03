@@ -8,6 +8,8 @@ from pathlib import Path
 import json
 import subprocess
 import time
+import re
+import shutil
 
 app = Flask(__name__)
 # Restrict total request size to 20MB.  We allow 2MB for the
@@ -18,7 +20,14 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+
+    # We need to see if we have a nanosplit job code passed to
+    # us - if we have then we need to tell the template so we
+    # can skip the request for input fastq files
+
+    nanosplit_code = request.args.get("nanosplit")
+
+    return render_template("index.html", nanosplit=nanosplit_code)
 
 
 @app.route("/start_alignment", methods=["GET","POST"])
@@ -34,14 +43,23 @@ def start_alignment():
     
     output_path.mkdir()
     
-
     files = request.files
+
+    # We should always have a reference sequence
     reference = files["reference"]
 
-    fastqs = []
-    for i in range(1,5):
-        if f"fastq{i}" in files and files[f"fastq{i}"].filename:
-            fastqs.append(files[f"fastq{i}"])
+    # For fastq files there are two options - we either pick these up from the
+    # submission form, or we get given a reference to a nanosplit job and we
+    # copy the sequences from there.
+
+    nanosplit = request.form.get("nanosplit")
+    fastqs = None
+
+    if not nanosplit:
+        fastqs = []
+        for i in range(1,5):
+            if f"fastq{i}" in files and files[f"fastq{i}"].filename:
+                fastqs.append(files[f"fastq{i}"])
 
     plannotate = "plannotate" in get_form() and get_form()["plannotate"]
 
@@ -53,9 +71,38 @@ def start_alignment():
     reference_filename = secure_filename(reference.filename)
     reference.save(output_path / reference_filename)
 
-    for fastq in fastqs:
-        fastq_filename = secure_filename(fastq.filename)
-        fastq.save(output_path / fastq_filename)
+
+    # We take different actions if we're pulling sequences from
+    # the form vs a nanosplit job
+
+    if fastqs is not None:
+        for fastq in fastqs:
+            fastq_filename = secure_filename(fastq.filename)
+            fastq.save(output_path / fastq_filename)
+
+    else:
+        # We're finding things from nanosplit
+        nanosplit_job_folder = Path(server_conf["nanosplit_folder"])/nanosplit
+
+        # Get the split fastqs from there
+        nanosplit_files = nanosplit_job_folder.glob("*")
+        nanosplit_fastq = []
+
+        # We're going to use a heuristic to check for the split
+        # fastq files.  They should end with a barcode sequence 
+        # and fastq/fq and maybe .gz.  This may be to broad but
+        # we can tighten later
+        pattern = re.compile(r"_[GATC]{4,}\.(?:fastq|fq)(?:\.gz)?$", re.IGNORECASE)
+
+        for file in nanosplit_files:
+            if pattern.search(file.name):
+                nanosplit_fastq.append(file)
+
+
+        # We need to copy the files to the run folder.
+        for fastq in nanosplit_fastq:
+            fastq_filename = secure_filename(fastq.name)
+            shutil.copy2(fastq,output_path/fastq_filename)
 
 
     # We want to launch the process to do the analysis. We're 

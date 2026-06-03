@@ -61,6 +61,57 @@
 			"type": "alignment",
 			"order": 7,
 			"height": 600
+		},
+				{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 8,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 9,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 10,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 11,
+			"height": 600
+		},
+		{
+			"url": "bam_url",
+			"filename": "bam_name",
+			"indexURL": "bai_url",
+			"name": "bam_name",
+			"format": "bam",
+			"type": "alignment",
+			"order": 12,
+			"height": 600
 		}
+
 	]
 }

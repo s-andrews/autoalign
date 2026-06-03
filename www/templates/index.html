@@ -24,7 +24,7 @@
   </div>
   <div class="row">
     <div class="alert alert-warning" role="alert">
-      NEWS: You can now process up to 5 fastq files in a single run<br>
+      NEWS: You can now process up to 5 fastq files in a single run up to a total size of 100MB<br>
       NEWS: We've improved queueing and logging so the server should be more stable.<br>
       NEWS: We now convert annotations to GFF3 format so that IGV shows the labels correctly.
     </div>
@@ -37,6 +37,10 @@
             <input class="form-control" name="reference" type="file" id="reference">
             <div id="reference_error" class="invalid-feedback">Text</div>
 
+            {% if nanosplit %}
+            <input type="hidden" name="nanosplit" value="{{ nanosplit }}">
+            <h4 class="mt-4">Sequences taken from nanosplit job <strong>{{ nanosplit }}</strong></h4>
+            {% else %}
             <label id="fqlabel1" for="fastq1">Sequencing File 1 (fastq.gz format)</label>
             <input class="form-control fastq" type="file" name="fastq1" id="fastq1">
             <div id="fastq_error1" class="invalid-feedback"></div>
@@ -58,7 +62,7 @@
             <div id="fastq_error5" class="invalid-feedback fqhidden"></div>
 
             <button class="btn btn-primary btn-sm mt-2" id="moreseq">Add More Sequences</button>
-
+            {% endif %}
             <div>
               <input class="form-check-input" type="checkbox" name="plannotate" id="plannotatecheck">
               <label id="plannotatelabel" class="form-check-label" for="plannotatecheck">Reannotate reference with <a href="https://github.com/mmcguffi/pLannotate">pLannotate</a></label>  

@@ -124,8 +124,8 @@ def main():
     if not fastq_files:
         raise Exception("Couldn't find fastq sequence file")
 
-    if len(fastq_files) > 5:
-        raise Exception("More than 5 fastq files found")
+    if len(fastq_files) > 10:
+        raise Exception("More than 10 fastq files found")
 
     aligned_files = []
     sorted_bam_files = []
@@ -294,9 +294,15 @@ def create_session_file(reference,annotation,bam_files,job_id, script_folder):
     session_data["reference"]["fastaURL"] = config["output_url"]+job_id+"/"+reference.name
     session_data["reference"]["indexURL"] = config["output_url"]+job_id+"/"+reference.name+".fai"
     session_data["locus"] = seqid
-    for i in range(1,6):
+
+    remove_tracks = []
+    for i in range(1,len(session_data["tracks"])):
+        if session_data["tracks"][i]["name"] == "Annotations":
+            session_data["tracks"][i]["url"] = config["output_url"]+job_id+"/"+annotation.name
+            break
+
         if i>len(bam_files):
-            del session_data["tracks"][len(bam_files)+1]
+            remove_tracks.append(i)
         else:
             session_data["tracks"][i]["url"] = config["output_url"]+job_id+"/"+bam_files[i-1]
             session_data["tracks"][i]["indexURL"] = config["output_url"]+job_id+"/"+bam_files[i-1]+".bai"
@@ -304,9 +310,9 @@ def create_session_file(reference,annotation,bam_files,job_id, script_folder):
             session_data["tracks"][i]["name"] = bam_files[i-1][:-4]
             session_data["tracks"][i]["height"] = track_height
 
-    if annotation is not None:
-        session_data["tracks"][len(bam_files)+1]["url"] = config["output_url"]+job_id+"/"+annotation.name
-
+    # We can remove any unused BAM tracks
+    for i in remove_tracks[::-1]:
+        del session_data["tracks"][i]
 
     session_file = "igv_session.json"
 
